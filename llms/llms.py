@@ -13,6 +13,7 @@ from .providers import AlephAlphaProvider
 from .providers import HuggingfaceHubProvider
 from .providers import GoogleProvider
 from .providers import GoogleGenAIProvider
+from .providers import MartianProvider
 from .providers.base_provider import BaseProvider
 from .results.result import AsyncStreamResult, Result, Results, StreamResult
 import concurrent.futures
@@ -43,6 +44,7 @@ class LLMS:
         Provider(HuggingfaceHubProvider, api_key_name="HUGGINFACEHUB_API_KEY"),
         Provider(GoogleGenAIProvider, api_key_name="GOOGLE_API_KEY"),
         Provider(GoogleProvider, needs_api_key=False),
+        Provider(MartianProvider, api_key_name="MARTIAN_API_KEY"),
     ]
     _providers: List[BaseProvider] = []
     _models: List[str] = []
@@ -316,7 +318,7 @@ Score: #
         model_results = {}
 
         def process_prompt(model, prompt, index, **kwargs):
-            print(model, index)
+            print(index, end=" ")
             result = model.complete(prompt, max_tokens=1000, temperature=0, **kwargs)
             output_data = {
                 "text": result.text,
@@ -386,7 +388,14 @@ Score: #
                 model_results[model]["evaluation"] = []
                 for i in range(len(model_results[model]["outputs"])):
                     model_results[model]["evaluation"].append(evaluation[i])
-            print(model_results)
+
+            ## martian edit: modify print results
+            print()
+            model_results[model]['evg_evaluation_score'] = statistics.mean(model_results[model]["evaluation"])
+            print({model: {k: v for k, v in model_results[model].items() if k != 'outputs'}})
+            # if 'evaluation' in model_results[model]:
+            #     print('evaluation scores', model_results[model]["evaluation"])
+            #     print('evaluation mean', statistics.mean(model_results[model]["evaluation"]))
             sorted_models = sorted(
                 model_results,
                 key=lambda x: model_results[x]["aggregated_speed"]
