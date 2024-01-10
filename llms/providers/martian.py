@@ -13,15 +13,22 @@ import os, dotenv
 dotenv.load_dotenv()
 MARTIAN_BEARER_TOKEN = os.getenv('MARTIAN_BEARER_TOKEN')
 MARTIAN_API_KEY = os.getenv('MARTIAN_API_KEY')
+# MARTIAN_TEST_API_KEY = os.getenv('MARTIAN_TEST_API_KEY')
+
 
 class MartianProvider(BaseProvider):
     # cost is per million tokens
+    token_limit = 2048
     MODEL_INFO = {
-        "martian/gpt-3.5-turbo": {"prompt": 2.0, "completion": 2.0, "token_limit": 4097, "is_chat": True},
-        "martian/gpt-3.5-turbo-instruct": {"prompt": 2.0, "completion": 2.0, "token_limit": 4097, "is_chat": False},
-        "martian/gpt-4": {"prompt": 30.0, "completion": 60.0, "token_limit": 8192, "is_chat": True},
-        "martian/gpt-4-1106-preview": {"prompt": 10.0, "completion": 20.0, "token_limit": 128000, "is_chat": True},
-        "martian/router": {"prompt": 0, "completion": 0, "token_limit": 4097, "is_chat": True},
+        "martian/openai/chat/gpt-3.5-turbo": {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": True},
+        "martian/openai/chat/gpt-3.5-turbo-instruct": {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": False},
+        "martian/openai/chat/gpt-4": {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": True},
+        "martian/openai/chat/gpt-4-turbo-128k": {"prompt": 10.0, "completion": 0, "token_limit": token_limit, "is_chat": True},
+        "martian/router": {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": True},
+        'martian/anthropic/claude-instant-v1': {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": True},
+        'martian/anthropic/claude-v2': {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": True},
+        'martian/meta/llama-2-70b-chat': {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": True},
+        'martian/mistralai/mixtral-8x7b-chat': {"prompt": 0, "completion": 0, "token_limit": token_limit, "is_chat": True},
     }
 
     def __init__(
@@ -30,12 +37,16 @@ class MartianProvider(BaseProvider):
         model: Union[str, None] = None,
         client_kwargs: Union[dict, None] = None,
         async_client_kwargs: Union[dict, None] = None,
+        test_db_and_staging: bool = False,
     ):
         if model is None:
             model = list(self.MODEL_INFO.keys())[0]
         self.model = model
         if client_kwargs is None:
             client_kwargs = {}
+        # if test_db_and_staging:
+        #     self.client = OpenAI(api_key=MARTIAN_TEST_API_KEY, **client_kwargs)
+        # else:
         self.client = OpenAI(api_key=MARTIAN_API_KEY, **client_kwargs)
         if async_client_kwargs is None:
             async_client_kwargs = {}

@@ -167,6 +167,12 @@ class LLMS:
 
     def benchmark(self, problems=None, evaluator=None, show_outputs=False, html=False, **kwargs):
         if not problems:
+            # problems = [
+            #     (
+            #         "A glass door has ‘push’ written on it in mirror writing. Should you push or pull it and why?",
+            #         "pull",
+            #     ),
+            #     ("Solve the quadratic equation: x^2 - 5x + 6 = 0", "x=2, x=3"),]
             problems = [
                 (
                     "A glass door has ‘push’ written on it in mirror writing. Should you push or pull it and why?",
@@ -280,6 +286,8 @@ Question: Is there a series of flights that goes from city F to city I?", "No"),
             ('Imagine there is a circular pond in an oasis, with two trees at the edge of the pond, on opposite sides. Bob sets up a hammock by hanging it between the two trees. He gets into the hammock and falls asleep. If he were to roll over in his sleep and fall out of the hammock, where would he fall?',
                 'water, in the center of the pond'),
             ]
+            # for i in range(len(problems)):
+            #     problems[i] = ('Please solve the problem in a concise manner: \n' + problems[i][0], problems[i][1])
 
 
         def evaluate_answers(
@@ -310,7 +318,7 @@ Score: #
                 if found:
                     scores.append(int(found.group(1)))
                 else:
-                    #print("No score found!", evaluator_result)
+                    print("No score found!", evaluator_result)
                     scores.append(0)
 
             return scores
